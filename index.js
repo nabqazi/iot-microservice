@@ -1,6 +1,12 @@
 import express from "express";
+import processEnv from "./dotenv.js";
+import mqttClient from "./services/mqtt-service.js";
 
-const port = parseInt(process.env.PORT) || 3000;
+const port = parseInt(processEnv.PORT) || 3000;
+
+// initialize mqtt client
+mqttClient.init();
+
 const app = express();
 
 app.get("/health", (req, res) => {
