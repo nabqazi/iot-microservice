@@ -1,60 +1,82 @@
 import mqtt from "mqtt";
 import processEnv from "../dotenv.js";
 
-const mqttServiceUrl = processEnv.MQTT_BROKER;
-const topic = "nabqazi";
-var eventId = 1;
+const MQTT_SERVICE_URL = processEnv.MQTT_BROKER;
+let TOPIC = "nabqazi";
 
-console.debug("mqttServiceUrl: ", mqttServiceUrl);
+// TODO: Add logic to init eventId
+let EVENT_ID = 1;
 
-function init() {
+let _MQTT_CLIENT = null;
+
+console.debug("mqttServiceUrl: ", MQTT_SERVICE_URL);
+
+function init(topic) {
   try {
-    const client = mqtt.connect(mqttServiceUrl);
+    if (topic) TOPIC = topic;
+
+    // Check if the connection exists
+    if (_MQTT_CLIENT && _MQTT_CLIENT.connected) {
+      console.info("Reusing existing connection");
+      return _MQTT_CLIENT;
+    }
+
+    const client = mqtt.connect(MQTT_SERVICE_URL);
 
     client.on("connect", () => {
       console.log("Connected to Mosquitto broker");
-      client.subscribe(topic);
-      console.log(`Listening on topic: ${topic}`);
+      client.subscribe(TOPIC);
+      console.log(`Listening on topic: ${TOPIC}`);
     });
 
-    client.on("message", (topic, message) => {
+    client.on("message", (TOPIC, message) => {
       console.log(
-        `${new Date().toISOString()}: Received message: topic:${topic}, message:${message}`
+        `${new Date().toISOString()}: Received message: topic:${TOPIC}, message:${message}`
       );
 
       // TODO: Add logic to handle message
+
+      // TODO: publish node emit event or take callback function to handle message
     });
 
-    setInterval(() => publishMessage(client), 1000);
+    // set _MQTT_CLIENT to check if the connection exists
+    _MQTT_CLIENT = client;
 
     return client;
   } catch (error) {
     console.error("Error connecting to Mosquitto broker: ", error);
+
+    throw error;
   }
 }
 
-function publishMessage(client) {
+function publishMessage(message = null) {
   try {
-    const msg = JSON.stringify({
-      timestamp: new Date().toISOString(),
-      eventId,
-    });
+    const msg = JSON.stringify(
+      message ?? {
+        timestamp: new Date().toISOString(),
+        eventId: EVENT_ID,
+      }
+    );
 
-    client.publish(topic, msg, (error) => {
+    _MQTT_CLIENT.publish(TOPIC, msg, (error) => {
       if (error) {
         console.error(`Error publishing message: ${error}`);
       } else {
-        console.log(`Message published to topic ${topic}: ${msg}`);
+        console.log(`Message published to topic ${TOPIC}: ${msg}`);
 
         // client.end();
       }
     });
-    eventId++;
+    EVENT_ID++;
   } catch (error) {
     console.error("Error publishing to Mosquitto broker: ", error);
+
+    throw error;
   }
 }
 
 export default {
   init: init,
+  initProducer: publishMessage,
 };

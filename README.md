@@ -12,6 +12,10 @@
   - npm install mqtt -g
   - set env variable `MQTT_BROKER` with value `test.mosquitto.org`
   - mqtt pub -t 'iot/event' -h 'test.mosquitto.org' -m 'ping'
+- setup mongodb locally
+  - npm install mongodb
+  - set up docker compose to run mongodb locally
+  - docker-compose up -d
 
 ## TODOs
 
