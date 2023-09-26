@@ -1,5 +1,11 @@
 # iot-microservice
 
+This project is a sample IOT microservice, which uses globally hosted mqtt service and local MongoDB.
+On startup, an ingestion service initialies mqtt and monogodb clients and start a mock producer at 5 sec interval
+On message received, the mqtt client emits the message using node native event emitter.
+The ingestion service listens to new msgs and validate, process and publish.
+
+
 ## Setup Node.js project
 
 - npm init
