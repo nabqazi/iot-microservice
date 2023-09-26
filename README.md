@@ -14,15 +14,19 @@
   - mqtt pub -t 'iot/event' -h 'test.mosquitto.org' -m 'ping'
 - setup mongodb locally
   - npm install mongodb
-  - set up docker compose to run mongodb locally
+  - set env variable `MONGODB_URL` with value `mongodb://localhost:27017`
+- runing mongodb and node server
   - docker-compose up -d
+  - docker-compose down (to stop mongodb)
+- access last 10 events in browser or postman
+  - curl 'http://localhost:3000/events'
 
 ## TODOs
 
 - [x] Setup Node.js project
 - [x] Create a mock data generator
-- [ ] Define data validation rules
-- [ ] Log data events for processing
+- [x] Define data validation rules
+- [x] Log data events for processing
 - [ ] Develop data anomaly detection algorithm
 - [ ] Setup alerts to report anomalies in data
-- [ ] Define tests to validate data processing
+- [x] Define tests

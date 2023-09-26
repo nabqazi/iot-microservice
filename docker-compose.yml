@@ -10,14 +10,14 @@ services:
     networks:
       - app-network
 
-  # server1:
-  #   build: ./
-  #   ports:
-  #     - "3000:3000"
-  #   # depends_on:
-  #   #   - mongodb
-  #   networks:
-  #     - app-network
+  server:
+    build: ./
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
 
 networks:
   app-network:
