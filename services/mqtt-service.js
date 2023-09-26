@@ -1,4 +1,5 @@
 import mqtt from "mqtt";
+import EventEmitter from "events";
 import processEnv from "../dotenv.js";
 
 const MQTT_SERVICE_URL = processEnv.MQTT_BROKER;
@@ -9,11 +10,14 @@ let EVENT_ID = 1;
 
 let _MQTT_CLIENT = null;
 
+let onMessageCallback = null;
+
 console.debug("mqttServiceUrl: ", MQTT_SERVICE_URL);
 
-function init(topic) {
+function init({ topic = null, onMessage = null, eventEmitter = null }) {
   try {
     if (topic) TOPIC = topic;
+    if (onMessage) onMessageCallback = onMessage;
 
     // Check if the connection exists
     if (_MQTT_CLIENT && _MQTT_CLIENT.connected) {
@@ -25,18 +29,18 @@ function init(topic) {
 
     client.on("connect", () => {
       console.log("Connected to Mosquitto broker");
+
       client.subscribe(TOPIC);
       console.log(`Listening on topic: ${TOPIC}`);
     });
 
     client.on("message", (TOPIC, message) => {
       console.log(
-        `${new Date().toISOString()}: Received message: topic:${TOPIC}, message:${message}`
+        `--------> Received message: topic:${TOPIC}, message:${message}`
       );
 
       // TODO: Add logic to handle message
-
-      // TODO: publish node emit event or take callback function to handle message
+      if (onMessageCallback) onMessageCallback(message);
     });
 
     // set _MQTT_CLIENT to check if the connection exists
@@ -63,7 +67,7 @@ function publishMessage(message = null) {
       if (error) {
         console.error(`Error publishing message: ${error}`);
       } else {
-        console.log(`Message published to topic ${TOPIC}: ${msg}`);
+        console.log(`<------- Message published to topic ${TOPIC}: ${msg}`);
 
         // client.end();
       }

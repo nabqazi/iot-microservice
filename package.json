@@ -21,6 +21,7 @@
     "@babel/cli": "^7.23.0",
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.22.20",
+    "assert": "^2.1.0",
     "chai": "^4.3.8",
     "dotenv": "^16.3.1",
     "mocha": "^10.2.0"
